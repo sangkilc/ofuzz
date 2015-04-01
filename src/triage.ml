@@ -76,11 +76,8 @@ let triage_txt = "triage.txt"
 
 let return_core_file pid = Printf.sprintf "/cores/core.%d" pid
 
-let clean_if_exists file =
-  if Sys.file_exists file then Unix.unlink file else ()
-
-let clean_up_triage_txt () = clean_if_exists triage_txt
-let clean_up_core core = clean_if_exists core
+let clean_up_triage_txt () = rm_if_exists triage_txt
+let clean_up_core core = rm_if_exists core
 
 module type TriageAlg =
 sig

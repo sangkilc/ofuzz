@@ -70,3 +70,6 @@ val to_abs : string -> string
     based on the CWD *)
 val to_abs_cmds : string list -> string list
 
+(** Unlink a file if it exists *)
+val rm_if_exists : string -> unit
+

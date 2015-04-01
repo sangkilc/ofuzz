@@ -381,7 +381,7 @@ let rec listen_to_client sock =
   listen_to_client sock
 
 let init_domain_socket name =
-  Unix.unlink name;
+  rm_if_exists name;
   let sock = Unix.socket Unix.PF_UNIX Unix.SOCK_STREAM 0 in
   Unix.bind sock (Unix.ADDR_UNIX name);
   Unix.listen sock 1;

@@ -109,3 +109,6 @@ let to_abs_cmds cmds =
   if not (Filename.is_relative prog) then cmds
   else (Filename.concat (Unix.getcwd()) prog) :: (List.tl cmds)
 
+let rm_if_exists file =
+  if Sys.file_exists file then Unix.unlink file else ()
+
