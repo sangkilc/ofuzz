@@ -1,0 +1,103 @@
+#!/usr/bin/env ocaml
+
+(** Compute a Hamming distance from two files
+
+    @author Sang Kil Cha <sangkil.cha\@gmail.com>
+    @since  2014-03-19
+
+ *)
+
+(*
+Copyright (c) 2014, Sang Kil Cha
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the <organization> nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL SANG KIL CHA BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+*)
+
+
+#load "str.cma"
+#load "unix.cma"
+
+module StringSet = Set.Make(struct
+  type t = string
+  let compare = String.compare
+end)
+
+let (|>) a b = b a
+
+let get_bit_dist f1 f2 =
+  let rec loop dist cnt f1 f2 =
+    if cnt <= 0 then dist
+    else
+      let b1 = 0x1 land f1 in
+      let b2 = 0x1 land f2 in
+      let f1 = f1 lsr 1 in
+      let f2 = f2 lsr 1 in
+      if b1 <> b2 then loop (dist+1) (cnt-1) f1 f2
+      else loop dist (cnt-1) f1 f2
+  in
+  let f1 = int_of_char f1 in
+  let f2 = int_of_char f2 in
+  loop 0 8 f1 f2
+
+let get_byte_dist f1 f2 =
+  if f1 = f2 then 0 else 1
+
+let hamming_distance f1 f2 =
+  assert ((String.length f1) = (String.length f2));
+  let rec check_loop bitcnt bytecnt idx =
+    if idx < 0 then bitcnt, bytecnt
+    else
+      let f1 = String.get f1 idx in
+      let f2 = String.get f2 idx in
+      if f1 = f2 then
+        check_loop bitcnt bytecnt (idx-1)
+      else
+        let dist = get_bit_dist f1 f2 in
+        let bytedist = get_byte_dist f1 f2 in
+        check_loop (bitcnt+dist) (bytecnt+bytedist) (idx-1)
+  in
+  let bitdist, bytedist = check_loop 0 0 ((String.length f1) - 1) in
+  bitdist, (String.length f1 * 8), bytedist, (String.length f1)
+
+let load_file f =
+  let ic = open_in f in
+  let n = in_channel_length ic in
+  let s = String.make n '\x00' in
+  really_input ic s 0 n;
+  close_in ic;
+  (s)
+
+let start () =
+  let f1 = Sys.argv.(1) |> load_file in
+  let f2 = Sys.argv.(2) |> load_file in
+  let bitdist, bittotal, bytedist, bytetotal = hamming_distance f1 f2 in
+  Printf.printf "%d,%d,%f,%d,%d,%f\n"
+    bitdist bittotal ((float_of_int bitdist) /. (float_of_int bittotal))
+    bytedist bytetotal ((float_of_int bytedist) /. (float_of_int bytetotal))
+
+let _ =
+  if Array.length Sys.argv <> 3 then
+    print_endline "usage: ./hamming <file1> <file2>"
+  else
+    start ()
+

@@ -1,0 +1,40 @@
+-- #crashes of a program
+
+SELECT SUM(s.uNumCrashes)
+FROM stats_tbl s
+JOIN fuzzing_tbl f ON f.uFuzzingId=s.uFuzzingId
+JOIN fuzz_conf_tbl fc ON fc.uFuzzConfId=f.uFuzzConfId
+WHERE uProgId=1;
+
+-- #unique bugs of a program
+
+SELECT COUNT(DISTINCT cs.uCrashId)
+FROM crash_stat_tbl cs
+JOIN stats_tbl s ON s.uStatsId=cs.uStatsId
+JOIN fuzzing_tbl f ON f.uFuzzingId=s.uFuzzingId
+JOIN fuzz_conf_tbl fc ON fc.uFuzzConfId=f.uFuzzConfId
+WHERE uProgId=1;
+
+-- list of mratio, #crashes pair
+
+SELECT fc.fMutationRatioBegin, s.uNumCrashes
+FROM stats_tbl s
+JOIN fuzzing_tbl f ON f.uFuzzingId=s.uFuzzingId
+JOIN fuzz_conf_tbl fc ON fc.uFuzzConfId=f.uFuzzConfId
+WHERE fc.uProgId=1
+INTO OUTFILE '/tmp/crash.csv'
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n';
+
+-- list of mratio, #bugs pair
+
+SELECT fc.fMutationRatioBegin, COUNT(DISTINCT cs.uCrashId)
+FROM fuzz_conf_tbl fc
+JOIN fuzzing_tbl f ON fc.uFuzzConfId=f.uFuzzConfId
+JOIN stats_tbl s ON f.uFuzzingId=s.uFuzzingId
+LEFT JOIN crash_stat_tbl cs ON s.uStatsId=cs.uStatsId
+WHERE uProgId=1
+GROUP BY fc.fMutationRatioBegin
+INTO OUTFILE '/tmp/crash.csv'
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n';

@@ -1,0 +1,3 @@
+settings set interpreter.prompt-on-quit false
+command script import triage.py
+stack_trace

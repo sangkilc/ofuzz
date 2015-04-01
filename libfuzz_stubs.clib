@@ -1,0 +1,2 @@
+src/libfuzz_helper.o
+src/libfuzz_stubs.o

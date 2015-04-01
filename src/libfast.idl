@@ -1,0 +1,62 @@
+/// ofuzz - ocaml fuzzing platform
+/// @brief: fast native functions for ofuzz
+/// @file: libfast.idl
+/// @author: Sang Kil Cha <sangkilc@cmu.edu>
+/// @date: 2014/03/19
+
+/*
+Copyright (c) 2014, Sang Kil Cha
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the <organization> nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL SANG KIL CHA BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ */
+
+/// copying a file using a sendfile system call
+boolean copy( [in, string] char* file_from, [in, string] char* file_to );
+
+/// exec a command with vfork
+int exec( [in, length_is(len), string*] char** cmds, [in] int len,
+          [in] int timeout, [in] boolean allow_output, [out] int* pid )
+  quote(call,
+        "  len = _c2;\n  _res = exec(cmds, len, timeout, allow_output, pid);");
+
+/// a hack to store a pointer (void*)
+typedef int mapped_ptr_t;
+
+/// memory mapped file
+typedef struct {
+  mapped_ptr_t ptr;
+  int size;
+  int fd;
+} filemap_t;
+
+/// mmap an existing file to use in OCaml
+[ptr] filemap_t* map_file( [in, string] const char* myfile, [in] int size );
+/// unmap a mmaped file
+void unmap_file( [in,ptr] filemap_t* map );
+/// modify a byte
+void mod_file( [in,ptr] filemap_t* map, [in] int pos, [in] char tovalue );
+/// get mapping size
+int get_mapping_size( [in] int realsize );
+/// size tuple
+int get_size_tuple( [in,string] const char* path, [out] int* realsize );
+
