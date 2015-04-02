@@ -72,7 +72,7 @@ let get_exec_timeout () = Opt.get opt_exec_timeout
 let opt_debugflag = StdOpt.store_true ()
 let get_debugflag () = Opt.get opt_debugflag
 
-let usage = "%prog <options> -s [seed] -c [crash] -f [pos] -- [cmd]"
+let usage = "%prog <options> -s [seed] -c [crash] -p [pos] -- [cmd]"
 
 let not_null argname = function
   | "" -> error_exit (Printf.sprintf "%s should be given." argname)
