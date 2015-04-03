@@ -34,9 +34,9 @@ Construct a unique hash for a given program state.
                 break
 
         if len(stacks) > 0:
-            print "|".join(map(lambda x: "%x" % x, stacks))
+            print("|".join(map(lambda x: "%x" % x, stacks)))
         else:
-            print "EMPTY"
+            print("EMPTY")
 
     def parse_args( self, args ):
         try:
