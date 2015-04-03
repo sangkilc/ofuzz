@@ -17,18 +17,38 @@
 
 OUTPUTDIR=ofuzz-output
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
 echo "Hamming distance test started."
 rm -rf $OUTPUTDIR
-echo "Fuzzing run."
-../ofuzz.native --triage --timeout=20 --gen-crash-tcs ./test.conf
+echo -n "Fuzzing run ... "
+../ofuzz --triage --timeout=20 --gen-crash-tcs ./test.conf
+if [ "$?" -ne "0" ]; then
+    echo -e "${RED}[failed]${NC}"
+    exit 1
+else
+    echo -e "${GREEN}[succeeded]${NC}"
+fi
+
+echo -n "Output check ... "
+if [ ! -d "$OUTPUTDIR" ]; then
+    echo -e "${RED}[failed]${NC}"
+    exit 1
+else
+    echo -e "${GREEN}[succeeded]${NC}"
+fi
+
 echo -n "Testcase check ... "
-for file in ofuzz-output/crashes/*
+for file in $OUTPUTDIR/crashes/*
 do
     diff=$(../utils/hamming $file testseed | awk -F, '{print $1}')
     if [ "$diff" -ne "2" ]; then
-        echo "Test failure."
+        echo -e "${RED}[failed]${NC}"
+        echo -e "${RED}$file${NC} has $diff"
         exit 1
     fi
 done
-echo "passed."
+echo -e "${GREEN}[succeeded]${NC}"
 
