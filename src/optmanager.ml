@@ -153,7 +153,7 @@ let get_debugflag () = Opt.get opt_debugflag
 (* test-gen *)
 let opt_testgen_alg =
   StdOpt.any_option
-    ~default:(Some ZzufMutational) ~metavar:"<ALG>" string_to_tc
+    ~default:(Some SurfaceMutational) ~metavar:"<ALG>" string_to_tc
 let get_testgen_alg () = Opt.get opt_testgen_alg
 
 let opt_seedrange =
