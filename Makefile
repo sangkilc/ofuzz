@@ -27,6 +27,8 @@ COMPATIBILITY=src/compatibility.ml
 
 all: depcheck version
 	$(OCAMLBUILD) $(OFUZZ_SUBDIRS) ofuzz.native minimizer.native
+	@mv ofuzz.native ofuzz
+	@mv minimizer.native minimizer
 
 version:
 ifeq ($(GIT_VERSION),)
