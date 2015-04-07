@@ -40,6 +40,7 @@ open Optmanager
 open Fuzzlib
 open Triage
 open Logger
+open Fuzzinterface
 
 let init_dirs knobs working_dir =
   if knobs.gen_all_tcs then cleanup_dir (get_tc_dir working_dir)
@@ -60,7 +61,9 @@ let reproducing_env knobs confs rseed st =
 
 let init_env knobs confs =
   let cwd = init_fuzzing_env knobs.output_dir knobs.gui in
-  let st = init_fuzzing_state knobs confs cwd in
+  let stats = Array.init (List.length confs) (fun _ -> null_stat ()) in
+  let wnd = init_interface knobs in
+  let st = init_fuzzing_state knobs confs stats cwd wnd in
   match knobs.reproduce_seed with
   | None -> fuzzing_env knobs confs st
   | Some (rseed, _) -> reproducing_env knobs confs rseed st

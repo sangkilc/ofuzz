@@ -38,7 +38,7 @@ Make sure you installed the following dependencies for compilation.
     We recommend using OPAM (http://opam.ocamlpro.com/).
 
    ```bash
-   opam install ocamlfind yojson camlidl mysql camlbz2 batteries
+   opam install ocamlfind yojson camlidl mysql camlbz2 batteries curses
    ```
 
 - Without OPAM (Debian, Ubuntu)
@@ -52,7 +52,7 @@ Make sure you installed the following dependencies for compilation.
         libgmp-dev libmpfr-dev libmpc-dev \
         libboost-dev libboost-filesystem-dev \
         libbatteries-ocaml-dev libyojson-ocaml-dev \
-        libmysql-ocaml-dev libbz2-ocaml-dev
+        libmysql-ocaml-dev libbz2-ocaml-dev libncurses5-dev
    ```
 
 Once you have installed all the necessary packages, simply run:

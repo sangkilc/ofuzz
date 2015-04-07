@@ -35,20 +35,26 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 
 open Fuzztypes
 open Optmanager
-open Mysql
+open Curses
 
 type fuzzing_state =
   {
-    rseed        : int64;
-    working_dir  : string;
-    knobs        : knobs;
-    stats        : fuzzstat array;
-    initial_time : float;
+    rseed         : int64;
+    working_dir   : string;
+    knobs         : knobs;
+    stats         : fuzzstat array;
+    initial_time  : float;
+    wnd           : window;
   }
 
 type timeout = float
 
-val init_fuzzing_state : knobs -> fuzzconf list -> string -> fuzzing_state
+val init_fuzzing_state : knobs
+                      -> fuzzconf list
+                      -> fuzzstat array
+                      -> string
+                      -> window
+                      -> fuzzing_state
 
 val destroy_fuzzing_state : fuzzing_state -> unit
 

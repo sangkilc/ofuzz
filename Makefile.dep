@@ -24,5 +24,6 @@ lib,yojson
 lib,batteries
 lib,mysql
 lib,bz2
+lib,curses
 # check headers
 header+,boost/dynamic_bitset.hpp

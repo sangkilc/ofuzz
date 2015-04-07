@@ -46,16 +46,12 @@ let init_logger file verbosity =
   chan := open_out_gen [Open_creat; Open_append] 0o666 file;
   desired_verbosity := verbosity
 
-let fin_logger () =
-  close_out !chan
+let fin_logger () = close_out !chan
 
-let flush () =
-  flush !chan
+let flush () = flush !chan
 
 let logf format =
-  let r = timeprintf !chan format in
-  flush ();
-  r
+  timeprintf !chan format
 
 let vlogf verbosity format =
   timeprintf ~ignore:(!desired_verbosity > verbosity) !chan format

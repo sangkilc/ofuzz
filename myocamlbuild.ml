@@ -68,6 +68,7 @@ let _ = dispatch begin function
          "pkg_batteries";
          "pkg_mysql";
          "pkg_bz2";
+         "pkg_curses";
         ];
 
       tag_file "src/libfast_stubs.c" ["stubs"];

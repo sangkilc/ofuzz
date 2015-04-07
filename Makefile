@@ -22,7 +22,7 @@ DIST_VERSION := $(shell head -n 1 ReleaseNotes.md | awk '{print $$4}')
 OFUZZ_DISTDIR := ofuzz-$(DIST_VERSION)
 OFUZZ_VERSION=src/ofuzzversion.ml
 OFUZZ_DOCDIR=ofuzz.docdir
-OFUZZ_SUBDIRS=-Is src,src/testgen,src/scheduling -Xs buildtools
+OFUZZ_SUBDIRS=-Is src,src/testgen,src/scheduling,src/interface -Xs buildtools
 COMPATIBILITY=src/compatibility.ml
 
 all: depcheck version

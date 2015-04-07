@@ -1,6 +1,6 @@
 (* ofuzz - ocaml fuzzing platform *)
 
-(** time printer
+(** fuzzing interface
 
     @author Sang Kil Cha <sangkil.cha\@gmail.com>
     @since  2014-03-19
@@ -33,19 +33,19 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 *)
 
-let fprintf_flush chan format =
-  let r = Printf.fprintf chan format in flush chan; r
+open Fuzztypes
+open Optmanager
+open Curses
 
-let printf_with_time chan =
-  let t = Unix.localtime (Unix.time ()) in
-  Printf.kfprintf fprintf_flush chan "[%02d:%02d:%02d-%02d/%02d] "
-    t.Unix.tm_hour
-    t.Unix.tm_min
-    t.Unix.tm_sec
-    (t.Unix.tm_mon + 1)
-    t.Unix.tm_mday
+(** Initialize interface *)
+val init_interface : knobs -> window
 
-let timeprintf ?ignore:(ignore=false) chan =
-  if ignore then Printf.ifprintf chan
-  else printf_with_time chan
+(** Destroy interface *)
+val destroy_interface : unit -> unit
+
+(** Update status *)
+val update_status : fuzzstat -> fuzzconf -> window -> unit
+
+(** Update interval in seconds *)
+val update_interval : float
 

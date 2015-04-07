@@ -38,15 +38,18 @@ open Testgen
 open Testeval
 open Optmanager
 open Logger
+open Fuzzinterface
+open Curses
 open Misc
 
 type fuzzing_state =
   {
-    rseed        : int64;
-    working_dir  : string;
-    knobs        : knobs;
-    stats        : fuzzstat array;
-    initial_time : float;
+    rseed         : int64;
+    working_dir   : string;
+    knobs         : knobs;
+    stats         : fuzzstat array;
+    initial_time  : float;
+    wnd           : window;
   }
 
 type timeout = float
@@ -72,11 +75,10 @@ let dbconnect knobs =
     else
       None
 
-let init_fuzzing_state knobs confs cwd =
+let init_fuzzing_state knobs confs stats cwd wnd =
   let () = init_logger (get_logfile cwd) knobs.verbosity in
   let () = init_testgen confs in
   let rseed = fst knobs.seed_range in
-  let stats = Array.init (List.length confs) (fun _ -> null_stat ()) in
   let dbhandle = dbconnect knobs in
   let () =
     match dbhandle with
@@ -89,9 +91,11 @@ let init_fuzzing_state knobs confs cwd =
     knobs = knobs;
     stats = stats;
     initial_time = 0.0;
+    wnd = wnd;
   }
 
 let destroy_fuzzing_state st =
+  destroy_interface ();
   fin_logger ()
 
 (** interrupt *)
@@ -185,24 +189,24 @@ struct
     let time_begin = Unix.time () in
     let id = conf.confid in
     let () = update_start_time id state.stats time_begin in
-    let rec fuzz_loop state =
+    let rec fuzz_loop state lastupdate =
       let testcase = TG.generate conf state.knobs state.rseed in
       let () = check_testcase testcase state in
       let result = TE.evaluate conf state.knobs triage_verbose testcase in
       let state = update_state id state testcase result in
       let time_diff, fin_time = timediff time_begin in
-      if time_diff >= timeout then begin
-        update_time id state fin_time time_diff
-      end else
-        fuzz_loop state
+      let lastupdate =
+        if fin_time -. lastupdate < update_interval then lastupdate
+        else (update_status state.stats.(id) conf state.wnd; fin_time)
+      in
+      if time_diff >= timeout then update_time id state fin_time time_diff
+      else fuzz_loop state lastupdate
     in
     let state =
-      try fuzz_loop state
-      with
-        | Interrupt -> begin
-            let time_diff, fin_time = timediff time_begin in
-            update_time id state fin_time time_diff
-          end
+      try fuzz_loop state time_begin
+      with Interrupt ->
+        let time_diff, fin_time = timediff time_begin in
+        update_time id state fin_time time_diff
     in
     let () = Sys.set_signal Sys.sigint Sys.Signal_default in
     state
