@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ver=$(ocamlopt -version)
 major=$(echo $ver | cut -f1 -d'.')
 minor=$(echo $ver | cut -f2 -d'.')
