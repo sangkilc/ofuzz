@@ -57,7 +57,7 @@ Make sure you installed the following dependencies for compilation.
 
 Once you have installed all the necessary packages, simply run:
 
-    ./configure && make
+    make
 
 To run OFuzz, one needs the followings.
 
